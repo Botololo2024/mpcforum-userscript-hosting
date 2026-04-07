@@ -1,7 +1,7 @@
 param(
     [string]$ProjectRoot = 'E:\mpcforum-userscript',
     [string]$BaseUrl = 'https://YOUR-CDN.example.com/mpcforum-userscript/src',
-    [string]$HostedModulesConfig = '',
+    [string]$HostedModulesConfig = $null,
     [string]$VersionBase = '50.40'
 )
 
@@ -69,7 +69,7 @@ $bundleOutput = ($bundleParts -join "`r`n") + "`r`n"
 $bundlePath = Join-Path $distRoot 'mpcforum-sebus-pack.user.js'
 Set-Content -Path $bundlePath -Value $bundleOutput -Encoding UTF8
 
-if (-not $HostedModulesConfig) {
+if (-not $HostedModulesConfig -or $HostedModulesConfig -eq '') {
     $defaultHostedConfig = Join-Path $ProjectRoot 'config\hosted-modules.json'
     if (Test-Path $defaultHostedConfig) {
         $HostedModulesConfig = $defaultHostedConfig

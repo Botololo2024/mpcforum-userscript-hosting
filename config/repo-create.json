@@ -1,0 +1,6 @@
+{
+  "name": "mpcforum-userscript-hosting",
+  "private": false,
+  "auto_init": false,
+  "description": "MPCForum Tampermonkey userscript modules hosting"
+}
