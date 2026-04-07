@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         MPCForum SebusPL - ULTIMATE PACK (module loader)
 // @namespace    http://tampermonkey.net/
-// @version      50.40-loader.202604070620
+// @version      50.40-loader.202604070628
 // @description  Developer loader fetching userscript modules from hosting
 // @author       Copilot
 // @match        *://*.mpcforum.pl/*
