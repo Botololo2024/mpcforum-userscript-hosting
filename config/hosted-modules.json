@@ -1,0 +1,17 @@
+﻿[
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/wrapper-start.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/10-config-state.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/20-mmo-storage-firebase.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/30-radio-core.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/40-shared-realtime.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/50-dom-ui-foundation.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/60-media-chat-tools.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/70-watch-games-panels.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/75-snejk.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/76-room.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/77-logo-badge.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/78-liquid-nav.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/80-baksy-mmo-advanced.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/90-bootstrap.js",
+    "https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/wrapper-end.js"
+]

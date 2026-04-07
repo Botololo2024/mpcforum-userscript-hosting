@@ -1,0 +1,93 @@
+[
+  {
+    "order": 10,
+    "file": "10-config-state.js",
+    "startLine": 13,
+    "endLine": 346,
+    "label": "Config, constants and runtime state"
+  },
+  {
+    "order": 20,
+    "file": "20-mmo-storage-firebase.js",
+    "startLine": 347,
+    "endLine": 2169,
+    "label": "MMO state, storage, auth and Firebase sync"
+  },
+  {
+    "order": 30,
+    "file": "30-radio-core.js",
+    "startLine": 2170,
+    "endLine": 3042,
+    "label": "Radio core, queue, YouTube sync and fallback playback"
+  },
+  {
+    "order": 40,
+    "file": "40-shared-realtime.js",
+    "startLine": 3043,
+    "endLine": 3525,
+    "label": "Watch Together, Mini Games, GIF Party and Whiteboard shared state"
+  },
+  {
+    "order": 50,
+    "file": "50-dom-ui-foundation.js",
+    "startLine": 3526,
+    "endLine": 6247,
+    "label": "DOM helpers, style injection, sticky notes, settings and base UI"
+  },
+  {
+    "order": 60,
+    "file": "60-media-chat-tools.js",
+    "startLine": 6248,
+    "endLine": 6896,
+    "label": "GIF search, MP3 picker, radio widgets and chat media tools"
+  },
+  {
+    "order": 70,
+    "file": "70-watch-games-panels.js",
+    "startLine": 6897,
+    "endLine": 8024,
+    "label": "Watch Together, Mini Games, GIF Party and Whiteboard panels"
+  },
+  {
+    "order": 75,
+    "file": "75-snejk.js",
+    "startLine": null,
+    "endLine": null,
+    "label": "Standalone retro snake mini-game panel"
+  },
+  {
+    "order": 76,
+    "file": "76-room.js",
+    "startLine": null,
+    "endLine": null,
+    "label": "Personal room builder with furniture shop and public visits"
+  },
+  {
+    "order": 77,
+    "file": "77-logo-badge.js",
+    "startLine": null,
+    "endLine": null,
+    "label": "3D ULTIMATE PACK animated logo badge next to forum logo"
+  },
+  {
+    "order": 78,
+    "file": "78-liquid-nav.js",
+    "startLine": null,
+    "endLine": null,
+    "label": "Apple Liquid Glass bottom-left nav replacing Menu Gier / Baksy Hub buttons"
+  },
+  {
+    "order": 80,
+    "file": "80-baksy-mmo-advanced.js",
+    "startLine": 8025,
+    "endLine": 13999,
+    "label": "Baksy economy, MMO systems, guild, market, boss and advanced panels"
+  },
+  {
+    "order": 90,
+    "file": "90-bootstrap.js",
+    "startLine": 14000,
+    "endLine": 14113,
+    "label": "Module registry, reactive runner and bootstrap"
+  }
+]

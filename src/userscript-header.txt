@@ -1,0 +1,9 @@
+// ==UserScript==
+// @name         MPCForum SebuśPL - ULTIMATE PACK (modular build)
+// @namespace    http://tampermonkey.net/
+// @version      50.40-modular
+// @description  Modularny build userscriptu dla mpcforum.pl
+// @author       Gemini + Copilot
+// @match        *://*.mpcforum.pl/*
+// @grant        none
+// ==/UserScript==
