@@ -168,7 +168,7 @@
 }
 
 /* Position panels above the liquid nav bar (≈70px height + 14px gap) */
-#sebus-main-games-nav {
+#sebus-games-panel {
     bottom: 94px !important;
     left: 14px !important;
 }
@@ -237,7 +237,7 @@
             <button class="sebus-lnav-btn" id="sebus-lnav-close" type="button" aria-label="Zamknij panel" style="padding:0 12px;min-width:44px;">
                 <div class="sebus-lnav-btn-content">${LNAV_ICON_CLOSE}</div>
             </button>
-            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:0;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
+            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:-60px;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
                 <span style="display:flex;align-items:center;gap:7px;">&rarr;</span>
             </div>
         `;
@@ -286,7 +286,7 @@
         // Helper: close all panels
         function closeAllPanels() {
             const panels = [
-                document.getElementById('sebus-main-games-nav'),
+                document.getElementById('sebus-games-panel'),
                 document.getElementById('sebus-baksy-hub'),
                 document.getElementById('sebus-baksy-league'),
                 document.getElementById('sebus-hazard-panel'),
@@ -315,8 +315,11 @@
                 if (btn.id === 'sebus-lnav-games') {
                     // Games menu
                     closeAllPanels();
-                    const gamesNav = document.getElementById('sebus-main-games-nav');
-                    if (gamesNav) gamesNav.style.display = gamesNav.style.display === 'none' ? 'block' : 'none';
+                    const gamesPanel = document.getElementById('sebus-games-panel');
+                    if (gamesPanel) {
+                        gamesPanel.style.display = (gamesPanel.style.display === 'none' || !gamesPanel.style.display) ? 'block' : 'none';
+                        gamesPanel.classList.toggle('show', gamesPanel.style.display === 'block');
+                    }
                 } else if (btn.id === 'sebus-lnav-baksy') {
                     // Baksy Hub
                     closeAllPanels();
@@ -329,15 +332,13 @@
         // Close button (hide nav, show handle)
         closeBtn.addEventListener('click', () => {
             closeAllPanels();
-            nav.style.transform = 'translateX(-90%)';
+            nav.style.transform = 'translateX(-92%)';
             nav.style.opacity = '0.2';
             nav.style.pointerEvents = 'none';
             if (handle) {
                 handle.style.display = 'flex';
-                setTimeout(() => {
-                    handle.style.transform = 'translateX(0)';
-                    handle.style.opacity = '1';
-                }, 10);
+                handle.style.transform = 'translateX(0)';
+                handle.style.opacity = '1';
             }
         });
 
@@ -348,7 +349,7 @@
                 nav.style.opacity = '1';
                 nav.style.pointerEvents = '';
                 handle.style.opacity = '0';
-                handle.style.transform = 'translateX(-40px)';
+                handle.style.transform = 'translateX(-60px)';
                 setTimeout(() => {
                     handle.style.display = 'none';
                 }, 350);
