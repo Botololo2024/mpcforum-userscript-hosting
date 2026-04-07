@@ -168,7 +168,7 @@
 }
 
 /* Position panels above the liquid nav bar (≈70px height + 14px gap) */
-#sebus-games-panel {
+#sebus-main-games-nav {
     bottom: 94px !important;
     left: 14px !important;
 }
@@ -286,7 +286,7 @@
         // Helper: close all panels
         function closeAllPanels() {
             const panels = [
-                document.getElementById('sebus-games-panel'),
+                document.getElementById('sebus-main-games-nav'),
                 document.getElementById('sebus-baksy-hub'),
                 document.getElementById('sebus-baksy-league'),
                 document.getElementById('sebus-hazard-panel'),
@@ -315,11 +315,8 @@
                 if (btn.id === 'sebus-lnav-games') {
                     // Games menu
                     closeAllPanels();
-                    const gamesPanel = document.getElementById('sebus-games-panel');
-                    if (gamesPanel) {
-                        gamesPanel.style.display = (gamesPanel.style.display === 'none' || !gamesPanel.style.display) ? 'block' : 'none';
-                        gamesPanel.classList.toggle('show', gamesPanel.style.display === 'block');
-                    }
+                    const gamesNav = document.getElementById('sebus-main-games-nav');
+                    if (gamesNav) gamesNav.style.display = gamesNav.style.display === 'none' ? 'block' : 'none';
                 } else if (btn.id === 'sebus-lnav-baksy') {
                     // Baksy Hub
                     closeAllPanels();
