@@ -315,7 +315,15 @@
                 if (btn.id === 'sebus-lnav-games') {
                     // Games menu
                     closeAllPanels();
-                    const gamesNav = document.getElementById('sebus-main-games-nav');
+                    // Ensure the panel exists
+                    let gamesNav = document.getElementById('sebus-main-games-nav');
+                    if (!gamesNav) {
+                        if (typeof initMainGamesNavigationIfNeeded === 'function') {
+                            gamesNav = initMainGamesNavigationIfNeeded();
+                        } else if (window.initMainGamesNavigationIfNeeded) {
+                            gamesNav = window.initMainGamesNavigationIfNeeded();
+                        }
+                    }
                     if (gamesNav) gamesNav.style.display = gamesNav.style.display === 'none' ? 'block' : 'none';
                 } else if (btn.id === 'sebus-lnav-baksy') {
                     // Baksy Hub
