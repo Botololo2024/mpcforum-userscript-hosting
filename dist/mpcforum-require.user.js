@@ -1,7 +1,7 @@
 ﻿// ==UserScript==
 // @name         MPCForum SebusPL - ULTIMATE PACK (@require loader)
 // @namespace    http://tampermonkey.net/
-// @version      50.40-require.202604070628
+// @version      50.40-require.202604071701
 // @description  Userscript based on @require (without runtime fetch)
 // @author       Copilot
 // @match        *://*.mpcforum.pl/*
@@ -19,6 +19,7 @@
 // @require      https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/77-logo-badge.js
 // @require      https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/78-liquid-nav.js
 // @require      https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/80-baksy-mmo-advanced.js
+// @require      https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/85-board-watch-gif.js
 // @require      https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/modules/90-bootstrap.js
 // @require      https://raw.githubusercontent.com/Botololo2024/mpcforum-userscript-hosting/main/hosted/wrapper-end.js
 // ==/UserScript==

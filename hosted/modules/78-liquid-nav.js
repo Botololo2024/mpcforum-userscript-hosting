@@ -227,6 +227,11 @@
                         ${LNAV_ICON_GAMES}<span>Menu Gier</span>
                     </div>
                 </button>
+                <button class="sebus-lnav-btn" id="sebus-lnav-tablica" type="button">
+                    <div class="sebus-lnav-btn-content">
+                        📝<span>Tablica</span>
+                    </div>
+                </button>
                 <button class="sebus-lnav-btn" id="sebus-lnav-baksy" type="button">
                     <div class="sebus-lnav-btn-content">
                         ${LNAV_ICON_BAKSY}<span>Baksy Hub</span>
@@ -325,6 +330,16 @@
                         }
                     }
                     if (gamesNav) gamesNav.style.display = gamesNav.style.display === 'none' ? 'block' : 'none';
+                } else if (btn.id === 'sebus-lnav-tablica') {
+                    // Tablica/Board/Watch/GIF panel
+                    closeAllPanels();
+                    if (typeof ensureBoardWatchGifPanel === 'function') {
+                        const panel = ensureBoardWatchGifPanel();
+                        if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                    } else if (window.ensureBoardWatchGifPanel) {
+                        const panel = window.ensureBoardWatchGifPanel();
+                        if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                    }
                 } else if (btn.id === 'sebus-lnav-baksy') {
                     // Baksy Hub
                     closeAllPanels();
@@ -350,6 +365,7 @@
         // Handle click (restore nav)
         if (handle) {
             handle.addEventListener('click', () => {
+                // Zawsze przywróć pasek do pełnej widoczności
                 nav.style.transform = '';
                 nav.style.opacity = '1';
                 nav.style.pointerEvents = '';

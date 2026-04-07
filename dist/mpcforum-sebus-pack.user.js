@@ -7363,59 +7363,18 @@
        WATCH TOGETHER — init + render + runner
        ═══════════════════════════════════════════════════════════════════ */
     function initWatchIfNeeded() {
-        if (!appSettings.features.watchTogether) return;
-        if (document.getElementById('sebus-watch-toggle')) return;
-
-        const toggle = document.createElement('button');
-        toggle.id = 'sebus-watch-toggle';
-        toggle.className = 'sebus-mp-toggle';
-        toggle.textContent = '🎬 Watch';
-        toggle.style.cssText = 'bottom:78px;right:14px;';
-        document.body.appendChild(toggle);
-
-        const panel = document.createElement('div');
-        panel.id = 'sebus-watch-panel';
-        panel.className = 'sebus-mp-panel';
-        panel.style.cssText = 'bottom:114px;right:14px;';
-        panel.innerHTML = `
-          <div class="sebus-mp-header">
-            <span class="sebus-mp-title">🎬 Watch Together</span>
-            <span class="sebus-mp-badge" id="sebus-watch-badge">0 widzów</span>
-            <button class="sebus-mp-close" id="sebus-watch-close">✕</button>
-          </div>
-          <div class="sebus-mp-body">
-            <div class="sebus-mp-row">
-              <input type="text" id="sebus-watch-input" placeholder="YouTube URL lub ID…">
-              <button class="sebus-mp-btn" id="sebus-watch-load">▶ Załaduj</button>
-            </div>
-            <iframe id="sebus-watch-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            <div class="sebus-watch-controls">
-              <button class="sebus-mp-btn" id="sebus-watch-play">▶</button>
-              <button class="sebus-mp-btn" id="sebus-watch-pause">⏸</button>
-            </div>
-            <div class="sebus-watch-viewers" id="sebus-watch-viewers"></div>
-            <div class="sebus-mp-status" id="sebus-watch-status"></div>
-          </div>`;
-        document.body.appendChild(panel);
-
-        toggle.addEventListener('click', () => {
-            const open = panel.classList.toggle('show');
-            toggle.classList.toggle('active', open);
-            if (open) { watchJoinAsViewer(); syncWatchState(); }
-        });
-        panel.querySelector('#sebus-watch-close').addEventListener('click', () => {
-            panel.classList.remove('show'); toggle.classList.remove('active');
-        });
-        panel.querySelector('#sebus-watch-load').addEventListener('click', () => {
-            const raw = panel.querySelector('#sebus-watch-input').value.trim();
-            if (!raw) return;
-            const id = extractYoutubeId(raw);
-            if (!id) { watchSetStatus('❌ Nie rozpoznano linku YouTube'); return; }
-            watchSetStatus('⏳ Ładowanie…');
-            watchSetVideo(id);
-        });
-        panel.querySelector('#sebus-watch-play').addEventListener('click', () => watchSendCommand('play'));
-        panel.querySelector('#sebus-watch-pause').addEventListener('click', () => watchSendCommand('pause'));
+                // Jeden wspólny przycisk do Tablica/Watch/GIF
+                if (document.getElementById('sebus-board-watch-gif-toggle')) return;
+                const toggle = document.createElement('button');
+                toggle.id = 'sebus-board-watch-gif-toggle';
+                toggle.className = 'sebus-mp-toggle';
+                toggle.textContent = '🧩 Tablica / Watch / GIF';
+                toggle.style.cssText = 'bottom:78px;right:14px;background:linear-gradient(90deg,#ffd700,#55ff88,#5599ff);color:#222;font-weight:700;';
+                document.body.appendChild(toggle);
+                toggle.addEventListener('click', () => {
+                        const panel = window.ensureBoardWatchGifPanel && window.ensureBoardWatchGifPanel();
+                        if (panel) panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+                });
     }
     function watchSetStatus(msg, ms=0) {
         const el = document.getElementById('sebus-watch-status');
@@ -7752,71 +7711,8 @@
        GIF PARTY — init + render + runner
        ═══════════════════════════════════════════════════════════════════ */
     function initGifPartyIfNeeded() {
-        if (!appSettings.features.gifParty) return;
-        if (document.getElementById('sebus-gifparty-toggle')) return;
-
-        const toggle = document.createElement('button');
-        toggle.id = 'sebus-gifparty-toggle';
-        toggle.className = 'sebus-mp-toggle';
-        toggle.textContent = '🎉 GIF Party';
-        toggle.style.cssText = 'bottom:150px;right:14px;';
-        document.body.appendChild(toggle);
-
-        const panel = document.createElement('div');
-        panel.id = 'sebus-gifparty-panel';
-        panel.className = 'sebus-mp-panel';
-        panel.style.cssText = 'bottom:186px;right:14px;';
-        panel.innerHTML = `
-          <div class="sebus-mp-header">
-            <span class="sebus-mp-title">🎉 GIF Party</span>
-            <span class="sebus-mp-badge" id="sebus-gp-badge">0 GIFów</span>
-            <button class="sebus-mp-close" id="sebus-gp-close">✕</button>
-          </div>
-          <div class="sebus-mp-body">
-            <div class="sebus-mp-row">
-              <input type="text" id="sebus-gp-input" placeholder="Szukaj GIFa (Tenor)…">
-              <button class="sebus-mp-btn" id="sebus-gp-search">🔍</button>
-            </div>
-            <div id="sebus-gp-results" style="display:flex;gap:4px;flex-wrap:wrap;max-height:80px;overflow-y:auto;margin:4px 0;"></div>
-            <div class="sebus-gp-feed" id="sebus-gp-feed"></div>
-            <div class="sebus-mp-status" id="sebus-gp-status"></div>
-          </div>`;
-        document.body.appendChild(panel);
-
-        toggle.addEventListener('click', () => {
-            const open = panel.classList.toggle('show');
-            toggle.classList.toggle('active', open);
-            if (open) syncGifParty();
-        });
-        panel.querySelector('#sebus-gp-close').addEventListener('click', () => {
-            panel.classList.remove('show'); toggle.classList.remove('active');
-        });
-        panel.querySelector('#sebus-gp-search').addEventListener('click', async () => {
-            const q = panel.querySelector('#sebus-gp-input').value.trim();
-            if (!q) return;
-            const res = panel.querySelector('#sebus-gp-results');
-            res.innerHTML = '⏳';
-            try {
-                const key = 'AIzaSyBVGBpE5lE3MnMG_CXWfC7Ck9wz5hBvHAA'; // Tenor public key
-                const r   = await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(q)}&key=${key}&limit=8&media_filter=gif`);
-                const d   = await r.json();
-                res.innerHTML = '';
-                (d.results||[]).forEach(g => {
-                    const url = g.media_formats?.gif?.url || g.url;
-                    if (!url) return;
-                    const img = document.createElement('img');
-                    img.src = url; img.style.cssText = 'height:60px;border-radius:4px;cursor:pointer;object-fit:cover;';
-                    img.addEventListener('click', async () => {
-                        const ok = await addGifToParty(url, g.content_description || q);
-                        if (ok) { res.innerHTML = ''; gpSetStatus('✅ GIF dodany!', 2000); }
-                        else gpSetStatus('❌ Błąd dodawania GIFa', 3000);
-                    });
-                    res.appendChild(img);
-                });
-                if (!d.results?.length) res.innerHTML = '<span style="color:rgba(255,232,183,.4);font-size:9px">Brak wyników</span>';
-            } catch(e) { res.innerHTML = ''; gpSetStatus(`❌ ${e.message}`, 3000); }
-        });
-    }
+                // Usunięty osobny przycisk GIF Party
+        }
     function gpSetStatus(msg, ms=0) {
         const el = document.getElementById('sebus-gp-status');
         if (el) el.textContent = msg;
@@ -7861,92 +7757,7 @@
        WHITEBOARD — init + render + runner
        ═══════════════════════════════════════════════════════════════════ */
     function initWhiteboardIfNeeded() {
-        if (!appSettings.features.whiteboard) return;
-        if (document.getElementById('sebus-whiteboard-toggle')) return;
-
-        const toggle = document.createElement('button');
-        toggle.id = 'sebus-whiteboard-toggle';
-        toggle.className = 'sebus-mp-toggle';
-        toggle.textContent = '🖌️ Tablica';
-        toggle.style.cssText = 'bottom:186px;right:14px;';
-        document.body.appendChild(toggle);
-
-        const COLORS = ['#ffd700','#ffffff','#ff5555','#55ff88','#5599ff','#ff88dd','#000000'];
-        const panel  = document.createElement('div');
-        panel.id     = 'sebus-whiteboard-panel';
-        panel.className = 'sebus-mp-panel';
-        panel.style.cssText = 'bottom:222px;right:14px;';
-        panel.innerHTML = `
-          <div class="sebus-mp-header">
-            <span class="sebus-mp-title">🖌️ Wspólna Tablica</span>
-            <span class="sebus-mp-badge" id="sebus-wb-badge">0 kresek</span>
-            <button class="sebus-mp-close" id="sebus-wb-close">✕</button>
-          </div>
-          <div class="sebus-mp-body">
-            <canvas id="sebus-wb-canvas" width="400" height="260"></canvas>
-            <div class="sebus-wb-toolbar">
-              ${COLORS.map((c,i)=>`<div class="sebus-wb-color${i===0?' sel':''}" style="background:${c}" data-c="${c}"></div>`).join('')}
-              <input type="range" class="sebus-wb-size" id="sebus-wb-size" min="1" max="20" value="3">
-              <button class="sebus-mp-btn" id="sebus-wb-clear" style="margin-left:auto">🗑️ Wyczyść</button>
-            </div>
-            <div class="sebus-mp-status" id="sebus-wb-status"></div>
-          </div>`;
-        document.body.appendChild(panel);
-
-        let wbColor = '#ffd700';
-        let wbSize  = 3;
-
-        toggle.addEventListener('click', () => {
-            const open = panel.classList.toggle('show');
-            toggle.classList.toggle('active', open);
-            if (open) syncWhiteboard();
-        });
-        panel.querySelector('#sebus-wb-close').addEventListener('click', () => {
-            panel.classList.remove('show'); toggle.classList.remove('active');
-        });
-        panel.querySelectorAll('.sebus-wb-color').forEach(dot => {
-            dot.addEventListener('click', () => {
-                wbColor = dot.dataset.c;
-                panel.querySelectorAll('.sebus-wb-color').forEach(d => d.classList.remove('sel'));
-                dot.classList.add('sel');
-            });
-        });
-        panel.querySelector('#sebus-wb-size').addEventListener('input', e => { wbSize = +e.target.value; });
-        panel.querySelector('#sebus-wb-clear').addEventListener('click', () => clearWhiteboard());
-
-        const canvas = panel.querySelector('#sebus-wb-canvas');
-        const getPos = e => {
-            const r = canvas.getBoundingClientRect();
-            const cl = e.touches ? e.touches[0] : e;
-            return [(cl.clientX - r.left) * (400 / r.width), (cl.clientY - r.top) * (260 / r.height)];
-        };
-        const onStart = e => {
-            e.preventDefault();
-            wbIsDrawing   = true;
-            wbCurStroke   = { points: [getPos(e)], color: wbColor, width: wbSize };
-        };
-        const onMove = e => {
-            e.preventDefault();
-            if (!wbIsDrawing || !wbCurStroke) return;
-            wbCurStroke.points.push(getPos(e));
-            // Live preview
-            const ctx = canvas.getContext('2d');
-            const pts = wbCurStroke.points;
-            ctx.strokeStyle = wbCurStroke.color;
-            ctx.lineWidth   = wbCurStroke.width;
-            ctx.lineCap     = 'round'; ctx.lineJoin = 'round';
-            if (pts.length >= 2) { ctx.beginPath(); ctx.moveTo(pts[pts.length-2][0], pts[pts.length-2][1]); ctx.lineTo(pts[pts.length-1][0], pts[pts.length-1][1]); ctx.stroke(); }
-        };
-        const onEnd = e => {
-            e.preventDefault();
-            if (!wbIsDrawing || !wbCurStroke || wbCurStroke.points.length < 2) { wbIsDrawing = false; return; }
-            wbIsDrawing = false;
-            const s = wbCurStroke;
-            wbCurStroke = null;
-            pushWbStroke(s);
-        };
-        canvas.addEventListener('mousedown', onStart); canvas.addEventListener('mousemove', onMove); canvas.addEventListener('mouseup', onEnd);
-        canvas.addEventListener('touchstart', onStart, {passive:false}); canvas.addEventListener('touchmove', onMove, {passive:false}); canvas.addEventListener('touchend', onEnd, {passive:false});
+        // Usunięty osobny przycisk Tablica
     }
     function wbSetStatus(msg, ms=0) {
         const el = document.getElementById('sebus-wb-status');
@@ -10454,6 +10265,11 @@
                         ${LNAV_ICON_GAMES}<span>Menu Gier</span>
                     </div>
                 </button>
+                <button class="sebus-lnav-btn" id="sebus-lnav-tablica" type="button">
+                    <div class="sebus-lnav-btn-content">
+                        📝<span>Tablica</span>
+                    </div>
+                </button>
                 <button class="sebus-lnav-btn" id="sebus-lnav-baksy" type="button">
                     <div class="sebus-lnav-btn-content">
                         ${LNAV_ICON_BAKSY}<span>Baksy Hub</span>
@@ -10464,7 +10280,7 @@
             <button class="sebus-lnav-btn" id="sebus-lnav-close" type="button" aria-label="Zamknij panel" style="padding:0 12px;min-width:44px;">
                 <div class="sebus-lnav-btn-content">${LNAV_ICON_CLOSE}</div>
             </button>
-            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:0;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
+            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:-60px;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
                 <span style="display:flex;align-items:center;gap:7px;">&rarr;</span>
             </div>
         `;
@@ -10542,8 +10358,26 @@
                 if (btn.id === 'sebus-lnav-games') {
                     // Games menu
                     closeAllPanels();
-                    const gamesNav = document.getElementById('sebus-main-games-nav');
+                    // Ensure the panel exists
+                    let gamesNav = document.getElementById('sebus-main-games-nav');
+                    if (!gamesNav) {
+                        if (typeof initMainGamesNavigationIfNeeded === 'function') {
+                            gamesNav = initMainGamesNavigationIfNeeded();
+                        } else if (window.initMainGamesNavigationIfNeeded) {
+                            gamesNav = window.initMainGamesNavigationIfNeeded();
+                        }
+                    }
                     if (gamesNav) gamesNav.style.display = gamesNav.style.display === 'none' ? 'block' : 'none';
+                } else if (btn.id === 'sebus-lnav-tablica') {
+                    // Tablica/Board/Watch/GIF panel
+                    closeAllPanels();
+                    if (typeof ensureBoardWatchGifPanel === 'function') {
+                        const panel = ensureBoardWatchGifPanel();
+                        if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                    } else if (window.ensureBoardWatchGifPanel) {
+                        const panel = window.ensureBoardWatchGifPanel();
+                        if (panel) panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                    }
                 } else if (btn.id === 'sebus-lnav-baksy') {
                     // Baksy Hub
                     closeAllPanels();
@@ -10556,26 +10390,25 @@
         // Close button (hide nav, show handle)
         closeBtn.addEventListener('click', () => {
             closeAllPanels();
-            nav.style.transform = 'translateX(-90%)';
+            nav.style.transform = 'translateX(-92%)';
             nav.style.opacity = '0.2';
             nav.style.pointerEvents = 'none';
             if (handle) {
                 handle.style.display = 'flex';
-                setTimeout(() => {
-                    handle.style.transform = 'translateX(0)';
-                    handle.style.opacity = '1';
-                }, 10);
+                handle.style.transform = 'translateX(0)';
+                handle.style.opacity = '1';
             }
         });
 
         // Handle click (restore nav)
         if (handle) {
             handle.addEventListener('click', () => {
+                // Zawsze przywróć pasek do pełnej widoczności
                 nav.style.transform = '';
                 nav.style.opacity = '1';
                 nav.style.pointerEvents = '';
                 handle.style.opacity = '0';
-                handle.style.transform = 'translateX(-40px)';
+                handle.style.transform = 'translateX(-60px)';
                 setTimeout(() => {
                     handle.style.display = 'none';
                 }, 350);
@@ -11581,8 +11414,7 @@
         });
         
         persistMmoState(true);
-        // Trigger Firebase sync and pull to ensure other users see the new guild
-        setTimeout(() => pullSharedMmoStateIfNeeded(true), 500);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true, message: '✅ Gilda założona!', guildId: newGuildId };
     }
 
@@ -11613,6 +11445,7 @@
         });
         guild.updatedAt = nowTs();
         persistMmoState(true);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true, message: '✅ Dołączyłeś do gildii!' };
     }
 
@@ -11630,6 +11463,7 @@
                 // Delete the entire guild
                 delete guildWarsState.guilds[guildId];
                 persistMmoState(true);
+                pullSharedMmoStateIfNeeded(true);
                 return { ok: true, message: '✅ Gilda rozwiązana (brak członków).' };
             } else {
                 // Promote first member to leader
@@ -11642,6 +11476,7 @@
         guild.members = guild.members.filter(m => m.userId !== userId);
         guild.updatedAt = nowTs();
         persistMmoState(true);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true, message: '✅ Opuściłeś gildię!' };
     }
 
@@ -11748,6 +11583,7 @@
         if (guild.chat.length > 100) guild.chat.shift();
         guild.updatedAt = nowTs();
         persistMmoState(true);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true };
     }
 
@@ -14616,10 +14452,16 @@
         const myId = getRuntimeUserId();
         if (!myId) return;
 
-        // Posty na forum (artykuły z data-commentid napisane przez mnie)
+        if (!msgEl) return;
+
+        if (!guildId || !guildWarsState.guilds[guildId]) {
+            msgEl.innerHTML = '<div style="color:#ff9999;">Nie należysz do żadnej gildii.</div>';
+            return;
+        }
+
         let postsFound = 0;
-        document.querySelectorAll('article[data-commentid], .cPost, .ipsComment').forEach(post => {
-            const authorEl = post.querySelector(`[data-memberid="${myId}"], [data-mentionid="${myId}"]`);
+        if (!guild.chat || guild.chat.length === 0) {
+            msgEl.innerHTML = '<div style="color:#bbb;">Brak wiadomości w czacie gildii.</div>';
             if (!authorEl) return;
             const key = buildPostActionKey(post);
             if (!missionReactionsSeenKeys.has(key + '_mypost')) {
@@ -16660,6 +16502,133 @@
             parent.replaceChild(span, node);
         });
     }
+
+// src/modules/85-board-watch-gif.js
+// Wspólny moduł: Tablica, Watch, GIF
+// Nowoczesne HTML5 rozwiązania
+
+(function(){
+    // --- Panel główny ---
+    function ensureBoardWatchGifPanel() {
+        let panel = document.getElementById('sebus-board-watch-gif-panel');
+        if (panel) return panel;
+        panel = document.createElement('div');
+        panel.id = 'sebus-board-watch-gif-panel';
+        panel.className = 'sebus-mp-panel';
+        panel.style.cssText = 'bottom:120px;left:440px;z-index:2147483642;min-width:420px;max-width:700px;display:none;background:#181818;border-radius:14px;padding:0 0 12px 0;box-shadow:0 8px 32px #000a;';
+        panel.innerHTML = `
+            <div style="display:flex;gap:8px;padding:12px 12px 0 12px;">
+                <button id="bw-tab-board" class="sebus-mp-btn" style="flex:1;">📝 Tablica</button>
+                <button id="bw-tab-watch" class="sebus-mp-btn" style="flex:1;">🎬 Watch</button>
+                <button id="bw-tab-gif" class="sebus-mp-btn" style="flex:1;">🖼️ GIF</button>
+            </div>
+            <div id="bw-content-board" style="display:block;padding:12px;"></div>
+            <div id="bw-content-watch" style="display:none;padding:12px;"></div>
+            <div id="bw-content-gif" style="display:none;padding:12px;"></div>
+        `;
+        document.body.appendChild(panel);
+        // Tab switching
+        panel.querySelector('#bw-tab-board').onclick = () => showTab('board');
+        panel.querySelector('#bw-tab-watch').onclick = () => showTab('watch');
+        panel.querySelector('#bw-tab-gif').onclick = () => showTab('gif');
+        function showTab(tab) {
+            panel.querySelector('#bw-content-board').style.display = tab==='board'?'block':'none';
+            panel.querySelector('#bw-content-watch').style.display = tab==='watch'?'block':'none';
+            panel.querySelector('#bw-content-gif').style.display = tab==='gif'?'block':'none';
+        }
+        // Inicjalizacja podpaneli
+        initBoard(panel.querySelector('#bw-content-board'));
+        initWatch(panel.querySelector('#bw-content-watch'));
+        initGif(panel.querySelector('#bw-content-gif'));
+        return panel;
+    }
+
+    // --- Tablica ---
+    function initBoard(container) {
+        container.innerHTML = `<h3>📝 Tablica (Sticky Notes & Canvas)</h3>
+        <div id="bw-board-canvas-wrap" style="border:1px solid #444;background:#222;border-radius:8px;min-height:220px;position:relative;overflow:auto;"></div>
+        <button id="bw-board-add-note" class="sebus-mp-btn" style="margin-top:8px;">Dodaj notatkę</button>
+        <button id="bw-board-clear" class="sebus-mp-btn" style="margin-top:8px;">Wyczyść tablicę</button>`;
+        const wrap = container.querySelector('#bw-board-canvas-wrap');
+        // Canvas
+        const canvas = document.createElement('canvas');
+        canvas.width = 600; canvas.height = 220;
+        canvas.style.background = '#191919';
+        canvas.style.borderRadius = '8px';
+        wrap.appendChild(canvas);
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        canvas.onmousedown = e => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
+        canvas.onmousemove = e => { if(drawing){ ctx.lineTo(e.offsetX, e.offsetY); ctx.strokeStyle = '#ffd700'; ctx.lineWidth = 2; ctx.stroke(); } };
+        canvas.onmouseup = () => { drawing = false; };
+        canvas.onmouseleave = () => { drawing = false; };
+        // Sticky notes
+        function addNote(txt='') {
+            const note = document.createElement('textarea');
+            note.className = 'bw-note';
+            note.value = txt;
+            note.style.cssText = 'position:absolute;top:10px;left:10px;width:120px;height:60px;background:#fffbe8;color:#222;border-radius:6px;border:1px solid #e2c96d;padding:6px;resize:both;z-index:10;box-shadow:2px 2px 8px #0002;';
+            note.onmousedown = e => { note.dataset.drag = '1'; note.dataset.ox = e.offsetX; note.dataset.oy = e.offsetY; };
+            note.onmouseup = () => { note.dataset.drag = ''; };
+            note.onmousemove = e => { if(note.dataset.drag==='1'){ note.style.left = (e.pageX - wrap.offsetLeft - note.dataset.ox*1) + 'px'; note.style.top = (e.pageY - wrap.offsetTop - note.dataset.oy*1) + 'px'; } };
+            wrap.appendChild(note);
+        }
+        container.querySelector('#bw-board-add-note').onclick = () => addNote();
+        container.querySelector('#bw-board-clear').onclick = () => { wrap.innerHTML = ''; wrap.appendChild(canvas); };
+    }
+
+    // --- Watch ---
+    function initWatch(container) {
+        container.innerHTML = `<h3>🎬 Watch (Wspólne oglądanie)</h3>
+        <input id="bw-watch-url" type="text" placeholder="Wklej link do filmu (YouTube/mp4)" style="width:70%;margin-bottom:8px;">
+        <button id="bw-watch-load" class="sebus-mp-btn">Załaduj</button>
+        <div id="bw-watch-player" style="margin-top:12px;"></div>`;
+        container.querySelector('#bw-watch-load').onclick = () => {
+            const url = container.querySelector('#bw-watch-url').value.trim();
+            const player = container.querySelector('#bw-watch-player');
+            if(url.includes('youtube.com')||url.includes('youtu.be')){
+                // YouTube embed
+                let vid = url.split('v=')[1]||'';
+                if(url.includes('youtu.be/')) vid = url.split('youtu.be/')[1];
+                vid = vid.split('&')[0];
+                player.innerHTML = `<iframe width='420' height='236' src='https://www.youtube.com/embed/${vid}' frameborder='0' allowfullscreen></iframe>`;
+            }else if(url.match(/\.(mp4|webm|ogg)$/i)){
+                player.innerHTML = `<video src='${url}' controls style='width:420px;max-width:100%;border-radius:8px;background:#000;'></video>`;
+            }else{
+                player.innerHTML = `<div style='color:#f66;'>Nieobsługiwany link.</div>`;
+            }
+        };
+    }
+
+    // --- GIF ---
+    function initGif(container) {
+        container.innerHTML = `<h3>🖼️ GIF (Wyszukiwarka i kreator)</h3>
+        <input id="bw-gif-query" type="text" placeholder="Szukaj GIFów (Giphy)" style="width:60%;margin-bottom:8px;">
+        <button id="bw-gif-search" class="sebus-mp-btn">Szukaj</button>
+        <div id="bw-gif-results" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;"></div>`;
+        container.querySelector('#bw-gif-search').onclick = async () => {
+            const q = container.querySelector('#bw-gif-query').value.trim();
+            const results = container.querySelector('#bw-gif-results');
+            results.innerHTML = '⏳ Szukanie...';
+            if(!q) { results.innerHTML = 'Podaj frazę.'; return; }
+            // Giphy API (public beta key)
+            const apikey = 'dc6zaTOxFJmzC';
+            const url = `https://api.giphy.com/v1/gifs/search?api_key=${apikey}&q=${encodeURIComponent(q)}&limit=12&rating=g`;
+            const res = await fetch(url).then(r=>r.json());
+            results.innerHTML = '';
+            (res.data||[]).forEach(gif=>{
+                const img = document.createElement('img');
+                img.src = gif.images.fixed_height.url;
+                img.style.cssText = 'width:120px;height:90px;object-fit:cover;border-radius:8px;cursor:pointer;box-shadow:0 2px 8px #0003;';
+                img.title = gif.title;
+                results.appendChild(img);
+            });
+        };
+    }
+
+    // --- Eksport do globalnego scope ---
+    window.ensureBoardWatchGifPanel = ensureBoardWatchGifPanel;
+})();
 
 // Module: 90-bootstrap.js
 // Source: e:\mpcforum-userscript\skrypt:14000-14113

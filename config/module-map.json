@@ -84,6 +84,13 @@
     "label": "Baksy economy, MMO systems, guild, market, boss and advanced panels"
   },
   {
+    "order": 85,
+    "file": "85-board-watch-gif.js",
+    "startLine": null,
+    "endLine": null,
+    "label": "Board, Watch Together and GIF Party unified panel"
+  },
+  {
     "order": 90,
     "file": "90-bootstrap.js",
     "startLine": 14000,
