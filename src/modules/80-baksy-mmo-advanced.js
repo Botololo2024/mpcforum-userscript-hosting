@@ -967,8 +967,7 @@
         });
         
         persistMmoState(true);
-        // Trigger Firebase sync and pull to ensure other users see the new guild
-        setTimeout(() => pullSharedMmoStateIfNeeded(true), 500);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true, message: '✅ Gilda założona!', guildId: newGuildId };
     }
 
@@ -999,6 +998,7 @@
         });
         guild.updatedAt = nowTs();
         persistMmoState(true);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true, message: '✅ Dołączyłeś do gildii!' };
     }
 
@@ -1016,6 +1016,7 @@
                 // Delete the entire guild
                 delete guildWarsState.guilds[guildId];
                 persistMmoState(true);
+                pullSharedMmoStateIfNeeded(true);
                 return { ok: true, message: '✅ Gilda rozwiązana (brak członków).' };
             } else {
                 // Promote first member to leader
@@ -1028,6 +1029,7 @@
         guild.members = guild.members.filter(m => m.userId !== userId);
         guild.updatedAt = nowTs();
         persistMmoState(true);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true, message: '✅ Opuściłeś gildię!' };
     }
 
@@ -1134,6 +1136,7 @@
         if (guild.chat.length > 100) guild.chat.shift();
         guild.updatedAt = nowTs();
         persistMmoState(true);
+        pullSharedMmoStateIfNeeded(true);
         return { ok: true };
     }
 
@@ -4002,10 +4005,16 @@
         const myId = getRuntimeUserId();
         if (!myId) return;
 
-        // Posty na forum (artykuły z data-commentid napisane przez mnie)
+        if (!msgEl) return;
+
+        if (!guildId || !guildWarsState.guilds[guildId]) {
+            msgEl.innerHTML = '<div style="color:#ff9999;">Nie należysz do żadnej gildii.</div>';
+            return;
+        }
+
         let postsFound = 0;
-        document.querySelectorAll('article[data-commentid], .cPost, .ipsComment').forEach(post => {
-            const authorEl = post.querySelector(`[data-memberid="${myId}"], [data-mentionid="${myId}"]`);
+        if (!guild.chat || guild.chat.length === 0) {
+            msgEl.innerHTML = '<div style="color:#bbb;">Brak wiadomości w czacie gildii.</div>';
             if (!authorEl) return;
             const key = buildPostActionKey(post);
             if (!missionReactionsSeenKeys.has(key + '_mypost')) {

@@ -237,7 +237,7 @@
             <button class="sebus-lnav-btn" id="sebus-lnav-close" type="button" aria-label="Zamknij panel" style="padding:0 12px;min-width:44px;">
                 <div class="sebus-lnav-btn-content">${LNAV_ICON_CLOSE}</div>
             </button>
-            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:0;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
+            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:-60px;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
                 <span style="display:flex;align-items:center;gap:7px;">&rarr;</span>
             </div>
         `;
@@ -315,7 +315,15 @@
                 if (btn.id === 'sebus-lnav-games') {
                     // Games menu
                     closeAllPanels();
-                    const gamesNav = document.getElementById('sebus-main-games-nav');
+                    // Ensure the panel exists
+                    let gamesNav = document.getElementById('sebus-main-games-nav');
+                    if (!gamesNav) {
+                        if (typeof initMainGamesNavigationIfNeeded === 'function') {
+                            gamesNav = initMainGamesNavigationIfNeeded();
+                        } else if (window.initMainGamesNavigationIfNeeded) {
+                            gamesNav = window.initMainGamesNavigationIfNeeded();
+                        }
+                    }
                     if (gamesNav) gamesNav.style.display = gamesNav.style.display === 'none' ? 'block' : 'none';
                 } else if (btn.id === 'sebus-lnav-baksy') {
                     // Baksy Hub
@@ -329,26 +337,25 @@
         // Close button (hide nav, show handle)
         closeBtn.addEventListener('click', () => {
             closeAllPanels();
-            nav.style.transform = 'translateX(-90%)';
+            nav.style.transform = 'translateX(-92%)';
             nav.style.opacity = '0.2';
             nav.style.pointerEvents = 'none';
             if (handle) {
                 handle.style.display = 'flex';
-                setTimeout(() => {
-                    handle.style.transform = 'translateX(0)';
-                    handle.style.opacity = '1';
-                }, 10);
+                handle.style.transform = 'translateX(0)';
+                handle.style.opacity = '1';
             }
         });
 
         // Handle click (restore nav)
         if (handle) {
             handle.addEventListener('click', () => {
+                // Zawsze przywróć pasek do pełnej widoczności
                 nav.style.transform = '';
                 nav.style.opacity = '1';
                 nav.style.pointerEvents = '';
                 handle.style.opacity = '0';
-                handle.style.transform = 'translateX(-40px)';
+                handle.style.transform = 'translateX(-60px)';
                 setTimeout(() => {
                     handle.style.display = 'none';
                 }, 350);

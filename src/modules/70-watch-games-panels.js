@@ -6,59 +6,18 @@
        WATCH TOGETHER — init + render + runner
        ═══════════════════════════════════════════════════════════════════ */
     function initWatchIfNeeded() {
-        if (!appSettings.features.watchTogether) return;
-        if (document.getElementById('sebus-watch-toggle')) return;
-
-        const toggle = document.createElement('button');
-        toggle.id = 'sebus-watch-toggle';
-        toggle.className = 'sebus-mp-toggle';
-        toggle.textContent = '🎬 Watch';
-        toggle.style.cssText = 'bottom:78px;right:14px;';
-        document.body.appendChild(toggle);
-
-        const panel = document.createElement('div');
-        panel.id = 'sebus-watch-panel';
-        panel.className = 'sebus-mp-panel';
-        panel.style.cssText = 'bottom:114px;right:14px;';
-        panel.innerHTML = `
-          <div class="sebus-mp-header">
-            <span class="sebus-mp-title">🎬 Watch Together</span>
-            <span class="sebus-mp-badge" id="sebus-watch-badge">0 widzów</span>
-            <button class="sebus-mp-close" id="sebus-watch-close">✕</button>
-          </div>
-          <div class="sebus-mp-body">
-            <div class="sebus-mp-row">
-              <input type="text" id="sebus-watch-input" placeholder="YouTube URL lub ID…">
-              <button class="sebus-mp-btn" id="sebus-watch-load">▶ Załaduj</button>
-            </div>
-            <iframe id="sebus-watch-frame" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
-            <div class="sebus-watch-controls">
-              <button class="sebus-mp-btn" id="sebus-watch-play">▶</button>
-              <button class="sebus-mp-btn" id="sebus-watch-pause">⏸</button>
-            </div>
-            <div class="sebus-watch-viewers" id="sebus-watch-viewers"></div>
-            <div class="sebus-mp-status" id="sebus-watch-status"></div>
-          </div>`;
-        document.body.appendChild(panel);
-
-        toggle.addEventListener('click', () => {
-            const open = panel.classList.toggle('show');
-            toggle.classList.toggle('active', open);
-            if (open) { watchJoinAsViewer(); syncWatchState(); }
-        });
-        panel.querySelector('#sebus-watch-close').addEventListener('click', () => {
-            panel.classList.remove('show'); toggle.classList.remove('active');
-        });
-        panel.querySelector('#sebus-watch-load').addEventListener('click', () => {
-            const raw = panel.querySelector('#sebus-watch-input').value.trim();
-            if (!raw) return;
-            const id = extractYoutubeId(raw);
-            if (!id) { watchSetStatus('❌ Nie rozpoznano linku YouTube'); return; }
-            watchSetStatus('⏳ Ładowanie…');
-            watchSetVideo(id);
-        });
-        panel.querySelector('#sebus-watch-play').addEventListener('click', () => watchSendCommand('play'));
-        panel.querySelector('#sebus-watch-pause').addEventListener('click', () => watchSendCommand('pause'));
+                // Jeden wspólny przycisk do Tablica/Watch/GIF
+                if (document.getElementById('sebus-board-watch-gif-toggle')) return;
+                const toggle = document.createElement('button');
+                toggle.id = 'sebus-board-watch-gif-toggle';
+                toggle.className = 'sebus-mp-toggle';
+                toggle.textContent = '🧩 Tablica / Watch / GIF';
+                toggle.style.cssText = 'bottom:78px;right:14px;background:linear-gradient(90deg,#ffd700,#55ff88,#5599ff);color:#222;font-weight:700;';
+                document.body.appendChild(toggle);
+                toggle.addEventListener('click', () => {
+                        const panel = window.ensureBoardWatchGifPanel && window.ensureBoardWatchGifPanel();
+                        if (panel) panel.style.display = (panel.style.display === 'block') ? 'none' : 'block';
+                });
     }
     function watchSetStatus(msg, ms=0) {
         const el = document.getElementById('sebus-watch-status');
@@ -395,71 +354,8 @@
        GIF PARTY — init + render + runner
        ═══════════════════════════════════════════════════════════════════ */
     function initGifPartyIfNeeded() {
-        if (!appSettings.features.gifParty) return;
-        if (document.getElementById('sebus-gifparty-toggle')) return;
-
-        const toggle = document.createElement('button');
-        toggle.id = 'sebus-gifparty-toggle';
-        toggle.className = 'sebus-mp-toggle';
-        toggle.textContent = '🎉 GIF Party';
-        toggle.style.cssText = 'bottom:150px;right:14px;';
-        document.body.appendChild(toggle);
-
-        const panel = document.createElement('div');
-        panel.id = 'sebus-gifparty-panel';
-        panel.className = 'sebus-mp-panel';
-        panel.style.cssText = 'bottom:186px;right:14px;';
-        panel.innerHTML = `
-          <div class="sebus-mp-header">
-            <span class="sebus-mp-title">🎉 GIF Party</span>
-            <span class="sebus-mp-badge" id="sebus-gp-badge">0 GIFów</span>
-            <button class="sebus-mp-close" id="sebus-gp-close">✕</button>
-          </div>
-          <div class="sebus-mp-body">
-            <div class="sebus-mp-row">
-              <input type="text" id="sebus-gp-input" placeholder="Szukaj GIFa (Tenor)…">
-              <button class="sebus-mp-btn" id="sebus-gp-search">🔍</button>
-            </div>
-            <div id="sebus-gp-results" style="display:flex;gap:4px;flex-wrap:wrap;max-height:80px;overflow-y:auto;margin:4px 0;"></div>
-            <div class="sebus-gp-feed" id="sebus-gp-feed"></div>
-            <div class="sebus-mp-status" id="sebus-gp-status"></div>
-          </div>`;
-        document.body.appendChild(panel);
-
-        toggle.addEventListener('click', () => {
-            const open = panel.classList.toggle('show');
-            toggle.classList.toggle('active', open);
-            if (open) syncGifParty();
-        });
-        panel.querySelector('#sebus-gp-close').addEventListener('click', () => {
-            panel.classList.remove('show'); toggle.classList.remove('active');
-        });
-        panel.querySelector('#sebus-gp-search').addEventListener('click', async () => {
-            const q = panel.querySelector('#sebus-gp-input').value.trim();
-            if (!q) return;
-            const res = panel.querySelector('#sebus-gp-results');
-            res.innerHTML = '⏳';
-            try {
-                const key = 'AIzaSyBVGBpE5lE3MnMG_CXWfC7Ck9wz5hBvHAA'; // Tenor public key
-                const r   = await fetch(`https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(q)}&key=${key}&limit=8&media_filter=gif`);
-                const d   = await r.json();
-                res.innerHTML = '';
-                (d.results||[]).forEach(g => {
-                    const url = g.media_formats?.gif?.url || g.url;
-                    if (!url) return;
-                    const img = document.createElement('img');
-                    img.src = url; img.style.cssText = 'height:60px;border-radius:4px;cursor:pointer;object-fit:cover;';
-                    img.addEventListener('click', async () => {
-                        const ok = await addGifToParty(url, g.content_description || q);
-                        if (ok) { res.innerHTML = ''; gpSetStatus('✅ GIF dodany!', 2000); }
-                        else gpSetStatus('❌ Błąd dodawania GIFa', 3000);
-                    });
-                    res.appendChild(img);
-                });
-                if (!d.results?.length) res.innerHTML = '<span style="color:rgba(255,232,183,.4);font-size:9px">Brak wyników</span>';
-            } catch(e) { res.innerHTML = ''; gpSetStatus(`❌ ${e.message}`, 3000); }
-        });
-    }
+                // Usunięty osobny przycisk GIF Party
+        }
     function gpSetStatus(msg, ms=0) {
         const el = document.getElementById('sebus-gp-status');
         if (el) el.textContent = msg;
@@ -504,92 +400,7 @@
        WHITEBOARD — init + render + runner
        ═══════════════════════════════════════════════════════════════════ */
     function initWhiteboardIfNeeded() {
-        if (!appSettings.features.whiteboard) return;
-        if (document.getElementById('sebus-whiteboard-toggle')) return;
-
-        const toggle = document.createElement('button');
-        toggle.id = 'sebus-whiteboard-toggle';
-        toggle.className = 'sebus-mp-toggle';
-        toggle.textContent = '🖌️ Tablica';
-        toggle.style.cssText = 'bottom:186px;right:14px;';
-        document.body.appendChild(toggle);
-
-        const COLORS = ['#ffd700','#ffffff','#ff5555','#55ff88','#5599ff','#ff88dd','#000000'];
-        const panel  = document.createElement('div');
-        panel.id     = 'sebus-whiteboard-panel';
-        panel.className = 'sebus-mp-panel';
-        panel.style.cssText = 'bottom:222px;right:14px;';
-        panel.innerHTML = `
-          <div class="sebus-mp-header">
-            <span class="sebus-mp-title">🖌️ Wspólna Tablica</span>
-            <span class="sebus-mp-badge" id="sebus-wb-badge">0 kresek</span>
-            <button class="sebus-mp-close" id="sebus-wb-close">✕</button>
-          </div>
-          <div class="sebus-mp-body">
-            <canvas id="sebus-wb-canvas" width="400" height="260"></canvas>
-            <div class="sebus-wb-toolbar">
-              ${COLORS.map((c,i)=>`<div class="sebus-wb-color${i===0?' sel':''}" style="background:${c}" data-c="${c}"></div>`).join('')}
-              <input type="range" class="sebus-wb-size" id="sebus-wb-size" min="1" max="20" value="3">
-              <button class="sebus-mp-btn" id="sebus-wb-clear" style="margin-left:auto">🗑️ Wyczyść</button>
-            </div>
-            <div class="sebus-mp-status" id="sebus-wb-status"></div>
-          </div>`;
-        document.body.appendChild(panel);
-
-        let wbColor = '#ffd700';
-        let wbSize  = 3;
-
-        toggle.addEventListener('click', () => {
-            const open = panel.classList.toggle('show');
-            toggle.classList.toggle('active', open);
-            if (open) syncWhiteboard();
-        });
-        panel.querySelector('#sebus-wb-close').addEventListener('click', () => {
-            panel.classList.remove('show'); toggle.classList.remove('active');
-        });
-        panel.querySelectorAll('.sebus-wb-color').forEach(dot => {
-            dot.addEventListener('click', () => {
-                wbColor = dot.dataset.c;
-                panel.querySelectorAll('.sebus-wb-color').forEach(d => d.classList.remove('sel'));
-                dot.classList.add('sel');
-            });
-        });
-        panel.querySelector('#sebus-wb-size').addEventListener('input', e => { wbSize = +e.target.value; });
-        panel.querySelector('#sebus-wb-clear').addEventListener('click', () => clearWhiteboard());
-
-        const canvas = panel.querySelector('#sebus-wb-canvas');
-        const getPos = e => {
-            const r = canvas.getBoundingClientRect();
-            const cl = e.touches ? e.touches[0] : e;
-            return [(cl.clientX - r.left) * (400 / r.width), (cl.clientY - r.top) * (260 / r.height)];
-        };
-        const onStart = e => {
-            e.preventDefault();
-            wbIsDrawing   = true;
-            wbCurStroke   = { points: [getPos(e)], color: wbColor, width: wbSize };
-        };
-        const onMove = e => {
-            e.preventDefault();
-            if (!wbIsDrawing || !wbCurStroke) return;
-            wbCurStroke.points.push(getPos(e));
-            // Live preview
-            const ctx = canvas.getContext('2d');
-            const pts = wbCurStroke.points;
-            ctx.strokeStyle = wbCurStroke.color;
-            ctx.lineWidth   = wbCurStroke.width;
-            ctx.lineCap     = 'round'; ctx.lineJoin = 'round';
-            if (pts.length >= 2) { ctx.beginPath(); ctx.moveTo(pts[pts.length-2][0], pts[pts.length-2][1]); ctx.lineTo(pts[pts.length-1][0], pts[pts.length-1][1]); ctx.stroke(); }
-        };
-        const onEnd = e => {
-            e.preventDefault();
-            if (!wbIsDrawing || !wbCurStroke || wbCurStroke.points.length < 2) { wbIsDrawing = false; return; }
-            wbIsDrawing = false;
-            const s = wbCurStroke;
-            wbCurStroke = null;
-            pushWbStroke(s);
-        };
-        canvas.addEventListener('mousedown', onStart); canvas.addEventListener('mousemove', onMove); canvas.addEventListener('mouseup', onEnd);
-        canvas.addEventListener('touchstart', onStart, {passive:false}); canvas.addEventListener('touchmove', onMove, {passive:false}); canvas.addEventListener('touchend', onEnd, {passive:false});
+        // Usunięty osobny przycisk Tablica
     }
     function wbSetStatus(msg, ms=0) {
         const el = document.getElementById('sebus-wb-status');
