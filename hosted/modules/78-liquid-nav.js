@@ -62,7 +62,7 @@
         inset 0 2px 3px -1px rgba(255,255,255,0.25),
         inset 0 -2px 4px -1px rgba(255,255,255,0.05),
         inset 0 0 0 1px rgba(255,255,255,0.15);
-    transition: box-shadow 0.4s ease, opacity 0.3s ease;
+    transition: box-shadow 0.4s ease, opacity 0.3s ease, transform 0.4s cubic-bezier(0.34,1.2,0.64,1);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
     -webkit-font-smoothing: antialiased;
     user-select: none;
@@ -232,26 +232,14 @@
                         ${LNAV_ICON_BAKSY}<span>Baksy Hub</span>
                     </div>
                 </button>
-                <button class="sebus-lnav-btn" id="sebus-lnav-table" type="button">
-                    <div class="sebus-lnav-btn-content">
-                        ${LNAV_ICON_TABLE}<span>Tablica</span>
-                    </div>
-                </button>
-                <button class="sebus-lnav-btn" id="sebus-lnav-gif" type="button">
-                    <div class="sebus-lnav-btn-content">
-                        ${LNAV_ICON_GIF}<span>GIF</span>
-                    </div>
-                </button>
-                <button class="sebus-lnav-btn" id="sebus-lnav-watch" type="button">
-                    <div class="sebus-lnav-btn-content">
-                        ${LNAV_ICON_WATCH}<span>Watch</span>
-                    </div>
-                </button>
             </div>
             <div id="sebus-liquid-nav-divider"></div>
             <button class="sebus-lnav-btn" id="sebus-lnav-close" type="button" aria-label="Zamknij panel" style="padding:0 12px;min-width:44px;">
                 <div class="sebus-lnav-btn-content">${LNAV_ICON_CLOSE}</div>
             </button>
+            <div id="sebus-liquid-nav-handle" style="display:none;position:fixed;left:0;bottom:14px;z-index:2147483646;cursor:pointer;padding:8px 12px 8px 2px;border-radius:0 99px 99px 0;background:rgba(30,30,35,0.7);box-shadow:0 4px 12px rgba(0,0,0,0.2);color:#fff;font-weight:600;user-select:none;transition:transform 0.4s cubic-bezier(0.34,1.2,0.64,1),opacity 0.3s;">
+                <span style="display:flex;align-items:center;gap:7px;">&rarr;</span>
+            </div>
         `;
 
         document.body.appendChild(nav);
@@ -272,6 +260,7 @@
         const glare     = nav.querySelector('#sebus-liquid-nav-glare');
         const btns      = nav.querySelectorAll('.sebus-lnav-btn:not(#sebus-lnav-close)');
         const closeBtn  = nav.querySelector('#sebus-lnav-close');
+        const handle    = nav.querySelector('#sebus-liquid-nav-handle');
 
         // Sliding pill positioning
         function updatePill(btn, animate = true) {
@@ -333,29 +322,38 @@
                     closeAllPanels();
                     const hub = document.getElementById('sebus-baksy-hub');
                     if (hub) hub.style.display = hub.style.display === 'none' ? 'block' : 'none';
-                } else if (btn.id === 'sebus-lnav-table') {
-                    // Tablica (Whiteboard)
-                    closeAllPanels();
-                    const whiteboardPanel = document.getElementById('sebus-whiteboard-panel');
-                    if (whiteboardPanel) whiteboardPanel.style.display = 'block';
-                } else if (btn.id === 'sebus-lnav-gif') {
-                    // GIF Party
-                    closeAllPanels();
-                    const gifPanel = document.getElementById('sebus-gifparty-panel');
-                    if (gifPanel) gifPanel.style.display = 'block';
-                } else if (btn.id === 'sebus-lnav-watch') {
-                    // Watch Together
-                    closeAllPanels();
-                    const watchPanel = document.getElementById('sebus-watch-panel');
-                    if (watchPanel) watchPanel.style.display = 'block';
                 }
             });
         });
 
-        // Close button
+        // Close button (hide nav, show handle)
         closeBtn.addEventListener('click', () => {
             closeAllPanels();
+            nav.style.transform = 'translateX(-90%)';
+            nav.style.opacity = '0.2';
+            nav.style.pointerEvents = 'none';
+            if (handle) {
+                handle.style.display = 'flex';
+                setTimeout(() => {
+                    handle.style.transform = 'translateX(0)';
+                    handle.style.opacity = '1';
+                }, 10);
+            }
         });
+
+        // Handle click (restore nav)
+        if (handle) {
+            handle.addEventListener('click', () => {
+                nav.style.transform = '';
+                nav.style.opacity = '1';
+                nav.style.pointerEvents = '';
+                handle.style.opacity = '0';
+                handle.style.transform = 'translateX(-40px)';
+                setTimeout(() => {
+                    handle.style.display = 'none';
+                }, 350);
+            });
+        }
 
         // Window resize → reposition pill
         window.addEventListener('resize', () => {
